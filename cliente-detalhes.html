@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Cliente - Sistema de Empréstimos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .detalhes-container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .voltar-btn {
+            background: #666;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+
+        .parcelas-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .parcelas-table th, .parcelas-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-pendente {
+            color: #f44336;
+        }
+
+        .status-pago {
+            color: #4CAF50;
+        }
+
+        .btn-pagar {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-pagar:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="detalhes-container">
+        <button onclick="window.location.href='dashboard.html'" class="voltar-btn">← Voltar</button>
+        
+        <h2 id="clienteNome">Detalhes do Cliente</h2>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>Valor do Empréstimo</h4>
+                <p id="valorEmprestimo">R$ 0,00</p>
+            </div>
+            <div class="info-card">
+                <h4>Total com Juros</h4>
+                <p id="valorTotal">R$ 0,00</p>
+            </div>
+            <div class="info-card">
+                <h4>Parcelas</h4>
+                <p id="numeroParcelas">0</p>
+            </div>
+            <div class="info-card">
+                <h4>Status</h4>
+                <p id="statusEmprestimo">-</p>
+            </div>
+        </div>
+
+        <h3>Parcelas</h3>
+        <table class="parcelas-table">
+            <thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="parcelasLista">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const TAXA_JUROS = 0.05; // 5% ao mês
+
+        function calcularJuros(valor, parcelas) {
+            const montante = valor * Math.pow(1 + TAXA_JUROS, parcelas);
+            const valorParcela = montante / parcelas;
+            return {
+                montante: montante,
+                valorParcela: valorParcela
+            };
+        }
+
+        function carregarDetalhesCliente() {
+            const clienteId = new URLSearchParams(window.location.search).get('id');
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            const cliente = clientes[clienteId];
+
+            if (!cliente) {
+                alert('Cliente não encontrado');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('clienteNome').textContent = cliente.nome;
+            document.getElementById('valorEmprestimo').textContent = `R$ ${cliente.valor.toFixed(2)}`;
+            document.getElementById('numeroParcelas').textContent = cliente.parcelas;
+            document.getElementById('statusEmprestimo').textContent = cliente.status;
+
+            const calculoJuros = calcularJuros(cliente.valor, cliente.parcelas);
+            document.getElementById('valorTotal').textContent = `R$ ${calculoJuros.montante.toFixed(2)}`;
+
+            // Gerar lista de parcelas
+            const tbody = document.getElementById('parcelasLista');
+            tbody.innerHTML = '';
+
+            const dataInicio = new Date(cliente.data);
+            for (let i = 0; i < cliente.parcelas; i++) {
+                const dataVencimento = new Date(dataInicio);
+                dataVencimento.setMonth(dataVencimento.getMonth() + i + 1);
+
+                const status = cliente.parcelasPagas?.[i] ? 'Pago' : 'Pendente';
+                const statusClass = status === 'Pago' ? 'status-pago' : 'status-pendente';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${dataVencimento.toLocaleDateString()}</td>
+                        <td>R$ ${calculoJuros.valorParcela.toFixed(2)}</td>
+                        <td class="${statusClass}">${status}</td>
+                        <td>
+                            <button 
+                                class="btn-pagar" 
+                                onclick="pagarParcela(${clienteId}, ${i})"
+                                ${status === 'Pago' ? 'disabled' : ''}
+                            >
+                                ${status === 'Pago' ? 'Pago' : 'Pagar'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function pagarParcela(clienteId, parcelaIndex) {
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            const cliente = clientes[clienteId];
+
+            if (!cliente.parcelasPagas) {
+                cliente.parcelasPagas = [];
+            }
+
+            cliente.parcelasPagas[parcelaIndex] = true;
+
+            // Verificar se todas as parcelas foram pagas
+            const todasPagas = cliente.parcelasPagas.length === cliente.parcelas && 
+                              cliente.parcelasPagas.every(paga => paga);
+            
+            if (todasPagas) {
+                cliente.status = 'Quitado';
+            }
+
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            carregarDetalhesCliente();
+        }
+
+        // Carregar detalhes ao abrir a página
+        document.addEventListener('DOMContentLoaded', carregarDetalhesCliente);
+    </script>
+</body>
+</html>
