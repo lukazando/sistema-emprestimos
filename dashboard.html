@@ -196,4 +196,7 @@ function atualizarListaClientes() {
 
 // Inicializar a lista ao carregar a página
 document.addEventListener('DOMContentLoaded', atualizarListaClientes);
+    function verDetalhes(index) {
+    window.location.href = `cliente-detalhes.html?id=${index}`;
+}
 </html>
