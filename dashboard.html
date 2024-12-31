@@ -112,4 +112,28 @@
         }
     </script>
 </body>
+    <!-- Modal de Novo Cliente -->
+<div id="modalNovoCliente" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+        <h3>Novo Cliente</h3>
+        <form id="formNovoCliente">
+            <div class="input-group">
+                <input type="text" id="nomeCliente" required placeholder="Nome completo">
+            </div>
+            <div class="input-group">
+                <input type="tel" id="telefoneCliente" required placeholder="Telefone">
+            </div>
+            <div class="input-group">
+                <input type="number" id="valorEmprestimo" required placeholder="Valor do empréstimo">
+            </div>
+            <div class="input-group">
+                <input type="number" id="parcelas" required placeholder="Número de parcelas">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" onclick="fecharModal()" style="background: #ddd;">Cancelar</button>
+                <button type="submit">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
 </html>
