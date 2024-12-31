@@ -136,4 +136,64 @@
         </form>
     </div>
 </div>
+    function abrirModalNovoCliente() {
+    document.getElementById('modalNovoCliente').style.display = 'flex';
+}
+
+function fecharModal() {
+    document.getElementById('modalNovoCliente').style.display = 'none';
+}
+
+document.getElementById('formNovoCliente').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const cliente = {
+        nome: document.getElementById('nomeCliente').value,
+        telefone: document.getElementById('telefoneCliente').value,
+        valor: parseFloat(document.getElementById('valorEmprestimo').value),
+        parcelas: parseInt(document.getElementById('parcelas').value),
+        data: new Date().toISOString(),
+        status: 'Ativo'
+    };
+    
+    // Salvar no localStorage (em um sistema real, isso seria salvo em um banco de dados)
+    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+    clientes.push(cliente);
+    localStorage.setItem('clientes', JSON.stringify(clientes));
+    
+    // Atualizar a tabela
+    atualizarListaClientes();
+    fecharModal();
+    
+    // Limpar formulário
+    e.target.reset();
+});
+
+function atualizarListaClientes() {
+    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+    const tbody = document.getElementById('clientesLista');
+    tbody.innerHTML = '';
+    
+    clientes.forEach((cliente, index) => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${cliente.nome}</td>
+                <td>R$ ${cliente.valor.toFixed(2)}</td>
+                <td>${new Date(cliente.data).toLocaleDateString()}</td>
+                <td>${cliente.status}</td>
+                <td>
+                    <button onclick="verDetalhes(${index})">Ver detalhes</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    // Atualizar totais
+    document.getElementById('totalClientes').textContent = clientes.length;
+    document.getElementById('totalEmprestado').textContent = 
+        'R$ ' + clientes.reduce((total, cliente) => total + cliente.valor, 0).toFixed(2);
+}
+
+// Inicializar a lista ao carregar a página
+document.addEventListener('DOMContentLoaded', atualizarListaClientes);
 </html>
