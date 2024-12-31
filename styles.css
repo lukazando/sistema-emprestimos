@@ -1,88 +1,31 @@
-/* Adicione ao seu arquivo styles.css */
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding: 1rem;
-}
-
-.btn-novo-cliente {
-    background: #34a853;
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border: none;
+.status {
+    padding: 4px 8px;
     border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-novo-cliente:hover {
-    background: #2d934a;
-}
-
-.dashboard-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-    color: #5f6368;
     font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
-.card p {
+.status.ativo {
+    background: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.status.quitado {
+    background: #e8f0fe;
     color: #1a73e8;
-    font-size: 1.5rem;
-    font-weight: 500;
 }
 
-.clients-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.clients-table th {
-    background: #f8f9fa;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 500;
-    color: #5f6368;
-}
-
-.clients-table td {
-    padding: 1rem;
-    border-top: 1px solid #eee;
+.status.atrasado {
+    background: #fce8e6;
+    color: #d93025;
 }
 
 .btn-detalhes {
     background: #1a73e8;
     color: white;
-    padding: 0.5rem 1rem;
     border: none;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.875rem;
-}
-
-.btn-detalhes:hover {
-    background: #1557b0;
-}
+    transition: background-
